@@ -1,0 +1,29 @@
+language: java
+
+jdk: oraclejdk8
+
+before_install:
+    # Download Liferay
+    - travis_wait git clone --depth=1 https://github.com/liferay/liferay-portal.git
+
+install:
+     # Gradle
+
+    - wget http://services.gradle.org/distributions/gradle-3.3-bin.zip
+    - unzip gradle-3.3-bin.zip
+    - export GRADLE_HOME=$PWD/gradle-3.3
+    - export PATH=$GRADLE_HOME/bin:$PATH
+
+    # Update ANT
+    - curl -o ${HOME}/apache-ant-1.9.9-bin.tar.gz https://www.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.tar.gz
+    - tar -xf ${HOME}/apache-ant-1.9.9-bin.tar.gz -C ${HOME}
+    - export PATH=${HOME}/apache-ant-1.9.9/bin:${PATH}
+
+    - ant -version
+
+
+script:
+    - cd liferay-portal
+    - export ANT_OPTS="-Xmx2048m -XX:MaxPermSize=512m"
+    - ant -buildfile build-dist.xml unzip-tomcat
+    - ant all
